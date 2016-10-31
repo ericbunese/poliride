@@ -3,7 +3,8 @@ post '/poliRide/createCar' do
   body = JSON.parse request.body.read
 
   if (body.has_key?"licensePlate" and body.has_key?"maker" and body.has_key?"model" and body.has_key?"ownerId" and body.has_key?"year" and body.has_key?"color")
-    unless (Car.first(licensePlate: body["licensePlate"]).nil?)
+    unless (Car.first(:licensePlate => body["licensePlate"]).nil?)
+      p Car.first(:licensePlate => body["licensePlate"])
       status 403
       response["error"] = 4
     else
@@ -37,12 +38,12 @@ post '/poliRide/createCar' do
 end
 
 get '/poliRide/car/:id' do
-  response = Car.first(id: params[:id])
+  response = Car.first(:id => params[:id])
   if (response.nil?)
     status 404
   else
     status 200
-  end  
+  end
   format_response(response, request.accept)
 end
 
@@ -51,7 +52,7 @@ get '/poliRide/cars' do
 end
 
 get '/poliRide/userCars/:id' do
-  response = Car.all(owner: params[:id])
+  response = Car.all(:owner => params[:id])
   status 200
   format_response(response, request.accept)
 end

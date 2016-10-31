@@ -3,7 +3,7 @@ post '/poliRide/createColor' do
   body = JSON.parse request.body.read
 
   if (body.has_key?"bgr" and body.has_key?"name")
-    unless (Color.first(name: body["name"]).nil?)
+    unless (Color.first(name: body["bgr"]).nil?)
       status 403
       response["error"] = 7
     else
@@ -24,7 +24,7 @@ get '/poliRide/color/:id' do
   response = Color.first(id: params[:id])
   if (response.nil?)
     status 404
-  else  
+  else
     status 200
   end
   format_response(response, request.accept)

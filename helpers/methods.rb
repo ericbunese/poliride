@@ -29,10 +29,16 @@ def validate_licensePlate(licensePlate)
   return not(/\w{3}\d{4}/.match(licensePlate).nil?)
 end
 
-#Tests for a user's existance
+#Tests for an user's existance
 def user_exists(userid)
   user = User.first(id: userid)
   return (not user.nil?)
+end
+
+#Tests for an offer's existance
+def offer_exists(offerid)
+  offer = Offer.first(id: offerid)
+  return (not offer.nil?)
 end
 
 #Gets important info about a user
@@ -47,4 +53,34 @@ def get_user_info(user)
   u["gender"] = user["gender"]
   u["accountConfirmed"] = user["accountConfirmed"]
   return u
+end
+
+#turns lat and long into string
+def location_string(lat, lng)
+  return lat.to_s + ";" + lng.to_s
+end
+
+#turns location string into lat and lng
+def location_destring(string)
+  a = string.split(";")
+  a.each {|b| b = b.to_f}
+  return a
+end
+
+#Converts degrees to radians
+def degrees_to_radians(degrees)
+  return degrees * Math::PI / 180
+end
+
+#Calculates the distance between two given points
+def location_distance(lat1, lng1, lat2, lng2)
+  lat1 = degrees_to_radians(lat1)
+  lat2 = degrees_to_radians(lat2)
+  lng1 = degrees_to_radians(lng1)
+  lng2 = degrees_to_radians(lng2)
+  dlon = lng2 - lng1
+  dlat = lat2 - lat1
+  a = (Math.sin(dlat/2))**2 + Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dlon/2))**2
+  c = 2 * Math.atan2( Math.sqrt(a), Math.sqrt(1-a) )
+  d = 6373 * c
 end

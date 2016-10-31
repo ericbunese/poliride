@@ -6,7 +6,7 @@ post '/poliRide/createUser' do
   body = JSON.parse request.body.read
 
   if (body.has_key?"firstName" and body.has_key?"lastName" and body.has_key?"email" and body.has_key?"password" and body.has_key?"grr" and body.has_key?"gender" and body.has_key?"phoneNumber")
-    unless (User.first(email: body["email"]).nil?)
+    unless (User.first(:email => body["email"]).nil?)
       status 403
       response["error"] = 0
     else
@@ -41,7 +41,7 @@ post '/poliRide/updateUser' do
   body = JSON.parse request.body.read
 
   if (body.has_key?"id")
-    user = User.first(id: body["id"])
+    user = User.first(:id => body["id"])
     unless(user.nil?)
       firstName = body["firstName"] || user.firstName
       lastName = body["lastName"] || user.lastName
@@ -51,7 +51,7 @@ post '/poliRide/updateUser' do
       gender = body["gender"] || user.gender
       phoneNumber = body["phoneNumber"] || user.phoneNumber
 
-      user.update(:firstName => firstName, :lastName => lastName, :email => email, :password => password, :grr => grr, :gender => gender, :phoneNumber => phoneNumber)
+      user.update(:firstName => firstName, :lastName => lastName, :email => email, :password => cypher_pass(password), :grr => grr, :gender => gender, :phoneNumber => phoneNumber)
       response = get_user_info(user)
       status 200
     else
@@ -70,7 +70,7 @@ post '/poliRide/verifyUser' do
   body = JSON.parse request.body.read
 
   if (body.has_key?"id" and body.has_key?"code")
-    user = User.first(id: body["id"])
+    user = User.first(:id => body["id"])
     unless (user.nil?)
       if (user.confirmationCode==body["code"])
         status 200
@@ -92,7 +92,7 @@ end
 
 #Get user info by id
 get '/poliRide/user/:id' do
-  response = User.first(id: params[:id])
+  response = User.first(:id => params[:id])
   status 200
   format_response(get_user_info(response), request.accept)
 end
@@ -116,7 +116,7 @@ post '/poliRide/userCredentials' do
   response["success"] = 0
 
   if (body.has_key?"email" and body.has_key?"password")
-    user = User.first(email: body["email"])
+    user = User.first(:email => body["email"])
     unless (user.nil?)
       response["user"] = get_user_info(user)
       if (user["accountConfirmed"]) #@==1

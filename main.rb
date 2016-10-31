@@ -5,6 +5,9 @@ require 'sinatra'
 require 'data_mapper'
 require 'dm-migrations'
 require 'phpass'
+require 'active_support'
+require 'simple_geolocation'
+require 'timeout'
 
 $phpass = Phpass.new
 
