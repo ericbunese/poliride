@@ -1,3 +1,7 @@
+def validate_pass(pass)
+  return (pass.length>=4)
+end
+
 #Cyphers the pass
 def cypher_pass(pass)
   return $phpass.hash(pass)
@@ -41,6 +45,12 @@ def offer_exists(offerid)
   return (not offer.nil?)
 end
 
+#Tests for a fuel's existance
+def fuel_exists(fuelid)
+  fuel = Fuel.first(id: fuelid)
+  return (not fuel.nil?)
+end
+
 #Gets important info about a user
 def get_user_info(user)
   u = Hash.new
@@ -52,6 +62,9 @@ def get_user_info(user)
   u["phoneNumber"] = user["phoneNumber"]
   u["gender"] = user["gender"]
   u["accountConfirmed"] = user["accountConfirmed"]
+  u["level"] = calculate_level(user["experiencePoints"])
+  u["xp"] = user["experiencePoints"]
+  u["money"] = user["currencyPoints"]
   return u
 end
 
@@ -83,4 +96,10 @@ def location_distance(lat1, lng1, lat2, lng2)
   a = (Math.sin(dlat/2))**2 + Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dlon/2))**2
   c = 2 * Math.atan2( Math.sqrt(a), Math.sqrt(1-a) )
   d = 6373 * c
+  return d
+end
+
+#Calculate a user's level by exp.
+def calculate_level(experiencePoints)
+  return experiencePoints div 1000
 end

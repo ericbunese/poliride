@@ -11,19 +11,26 @@ post '/poliRide/createUser' do
       response["error"] = 0
     else
       if (validate_grr(body["grr"]) and validate_email(body["email"]))
-        user = User.create(
-          firstName: body["firstName"],
-          lastName: body["lastName"],
-          email: body["email"],
-          password: cypher_pass(body["password"]),
-          grr: body["grr"],
-          gender: body["gender"],
-          phoneNumber: body["phoneNumber"],
-          confirmationCode: generate_confirmationCode(body["grr"]),
-          accountConfirmed: 0
-        )
-        status 201
-        response = get_user_info(user)
+        if (validate_pass(body["password"]))
+          user = User.create(
+            firstName: body["firstName"],
+            lastName: body["lastName"],
+            email: body["email"],
+            password: cypher_pass(body["password"]),
+            grr: body["grr"],
+            gender: body["gender"],
+            phoneNumber: body["phoneNumber"],
+            confirmationCode: generate_confirmationCode(body["grr"]),
+            accountConfirmed: 0,
+            experiencePoints: 0,
+            currencyPoints: 0
+          )
+          status 201
+          response = get_user_info(user)
+        else
+          status 403
+          response["error"] = 15
+        end
       else
         status 403
         response["error"] = 1
@@ -133,6 +140,28 @@ post '/poliRide/userCredentials' do
       end
     else
       status 404
+    end
+  else
+    status 422
+  end
+
+  format_response(response, request.accept)
+end
+
+#give points to the user
+post '/poliRide/prize' do
+  response = Hash.new
+  body = JSON.parse request.body.read
+
+  if (body.has_key?"id" and body.has_key?"points")
+    user = User.first(:id => body["id"])
+    unless (user.nil?)
+      currencyPoints = user.currencyPoints+body["points"]
+      experiencePoints = user.experiencePoints+body["points"]
+      user.update(:experiencePoints => experiencePoints, :currencyPoints => currencyPoints)
+    else
+      status 404
+      response["error"] = -1 #@corrigir código para usuário não encontrado
     end
   else
     status 422

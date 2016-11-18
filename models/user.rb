@@ -12,4 +12,6 @@ class User
   property :phoneNumber,      String
   property :confirmationCode, String
   property :accountConfirmed, Integer
+  property :experiencePoints, Integer
+  property :currencyPoints, Integer
 end

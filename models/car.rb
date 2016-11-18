@@ -9,4 +9,5 @@ class Car
   property :owner,            Integer
   property :year,             Integer
   property :color,            String
+  property :fuel,             Integer
 end

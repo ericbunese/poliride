@@ -2,7 +2,7 @@ post '/poliRide/createCar' do
   response = Hash.new
   body = JSON.parse request.body.read
 
-  if (body.has_key?"licensePlate" and body.has_key?"maker" and body.has_key?"model" and body.has_key?"ownerId" and body.has_key?"year" and body.has_key?"color")
+  if (body.has_key?"licensePlate" and body.has_key?"maker" and body.has_key?"model" and body.has_key?"ownerId" and body.has_key?"year" and body.has_key?"color" and body.has_key?"fuelId")
     unless (Car.first(:licensePlate => body["licensePlate"]).nil?)
       p Car.first(:licensePlate => body["licensePlate"])
       status 403
@@ -10,16 +10,22 @@ post '/poliRide/createCar' do
     else
       if (validate_licensePlate(body["licensePlate"]))
         if (user_exists(body["ownerId"]))
-          car = Car.create(
-            licensePlate: body["licensePlate"],
-            maker: body["maker"],
-            carModel: body["model"],
-            year: body["year"],
-            color: body["color"],
-            owner: body["ownerId"]
-          )
-          status 201
-          response = car
+          if (fuel_exists(body["fuelId"]))
+            car = Car.create(
+              licensePlate: body["licensePlate"],
+              maker: body["maker"],
+              carModel: body["model"],
+              year: body["year"],
+              color: body["color"],
+              owner: body["ownerId"],
+              fuel: body["fuelId"]
+            )
+            status 201
+            response = car
+          else
+            status 404
+            response["error"] = 15
+          end
         else
           status 404
           response["error"] = 6
