@@ -5,7 +5,7 @@ class Offer
   property :id,         			Serial, :required => true
   property :status,      	    Integer
   property :driver,           Integer
-  property :datetime,      		Integer
+  property :datetime,      		String
   property :origin,           String
   property :destination,      String
 end

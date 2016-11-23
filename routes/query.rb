@@ -2,27 +2,39 @@ post '/poliRide/query' do
   responseOffers = Array.new
   body = JSON.parse request.body.read
 
-  if (body.has_key?"location" and body.has_key?"maxDistance" and body.has_key?"datetime")
-    loc = location_destring(body["location"])
-    lat1 = loc[0]
-    lat2 = loc[1]
+  if (body.has_key?"origin" and body.has_key?"destination" and body.has_key?"maxDistance" and body.has_key?"datetime")
+    ori = location_destring(body["origin"])
+    latO = ori[0]
+    lngO = ori[1]
 
-    minTime = Time.at(body["datetime"] - 30*60) #Half an hour earlier
-    maxTime = Time.at(body["datetime"] + 30*60) #Half an hour later
+    dst = location_destring(body["destination"])
+    latD = dst[0]
+    lngD = dst[1]
 
-    offers = Offer.all()
+    minTime = (Time.parse(body["datetime"]) - 1800).to_i
+    maxTime = (Time.parse(body["datetime"]) + 1800).to_i
+
+    offers = Offer.all(:status => 1)
     offers.each do |of|
-      loc2 = location_destring(of.origin)
-      lat2 = loc[0]
-      lng2 = loc[1]
+      dOri = location_destring(of.origin)
+      latDO = dOri[0]
+      lngDO = dOri[1]
 
-      if (location_distance(lat1, lng1, lat2, lng2)<=body["maxDistance"])
-        if (of.datetime.between?(minTime, maxTime))
+      dDst = location_destring(of.destination)
+      latDD = dDst[0]
+      lngDD = dDst[1]
+
+      originDistance = location_distance(latO, lngO, latDO, lngDO)
+      destinationDistance = location_distance(latD, lngD, latDD, lngDD)
+
+      offerDatetime = Time.parse(of.datetime).to_i
+
+      if (originDistance<=body["maxDistance"] and destinationDistance<=body["maxDistance"])
+        if (offerDatetime.between?(minTime, maxTime))
           responseOffers << of
         end
       end
     end
-
   else
     status 422
   end

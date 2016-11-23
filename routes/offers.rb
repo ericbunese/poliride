@@ -4,18 +4,23 @@ post '/poliRide/createOffer' do
   body = JSON.parse request.body.read
 
   if (body.has_key?"driver" and body.has_key?"datetime" and body.has_key?"origin" and body.has_key?"destination")
-    offer = Offer.create(
-      driver: body["driver"],
-      datetime: body["datetime"],
-      origin: body["origin"],
-      destination: body["destination"],
-      status: 1
-    )
-    status 201
-    response = offer
+    if (user_exists(body["driver"]))
+      offer = Offer.create(
+        status: 1,
+        driver: body["driver"],
+        datetime: body["datetime"],
+        origin: body["origin"],
+        destination: body["destination"]
+      )
+      status 201
+      response = offer
+    else
+      status 404
+    end
   else
     status 422
   end
+
   format_response(response, request.accept)
 end
 

@@ -76,8 +76,9 @@ end
 #turns location string into lat and lng
 def location_destring(string)
   a = string.split(";")
-  a.each {|b| b = b.to_f}
-  return a
+  c = Array.new
+  a.each {|b| c << b.to_f}
+  return c
 end
 
 #Converts degrees to radians
@@ -101,5 +102,5 @@ end
 
 #Calculate a user's level by exp.
 def calculate_level(experiencePoints)
-  return experiencePoints div 1000
+  return (experiencePoints / 1000).floor
 end
