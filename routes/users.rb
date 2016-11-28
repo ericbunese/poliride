@@ -169,3 +169,15 @@ post '/poliRide/prize' do
 
   format_response(response, request.accept)
 end
+
+get '/poliRide/userIsDriver/:id' do
+  response = Hash.new
+  cars = Car.all(owner: params[:id])
+  offers = Offer.all(driver: params[:id])
+  if (cars.length>0 and offers.length>0)
+    response["isDriver"] = 1
+  else
+    response["isDriver"] = 0
+  end
+  format_response(response, request.accept)
+end

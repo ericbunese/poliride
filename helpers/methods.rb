@@ -102,5 +102,37 @@ end
 
 #Calculate a user's level by exp.
 def calculate_level(experiencePoints)
-  return (experiencePoints / 1000).floor
+  return (experiencePoints / 1000).floor+1
+end
+
+def join_ride_offer(ride)
+  ret = Hash.new
+  ret["id"] = ride.id
+  ret["driver"] = ride.driver
+  ret["rider"] = ride.rider
+  ret["status"] = ride.status
+  offer = Offer.first(id: ride.offer)
+  unless(offer.nil?)
+    ret["offer"] = offer
+  else
+    ret["offer"] = ""
+  end
+  return ret
+end
+
+def join_offer_rides(offer)
+  ret = Hash.new
+  ret["id"] = offer.id
+  ret["status"] = offer.status
+  ret["driver"] = offer.driver
+  ret["datetime"] = offer.datetime
+  ret["origin"] = offer.origin
+  ret["destination"] = offer.destination
+  ret["originAddress"] = offer.originAddress
+  ret["destinationAddress"] = offer.destinationAddress
+  ret["carInfo"] = offer.carInfo
+  ret["rides"] = Array.new
+
+  ret["rides"] = Ride.all(offer: offer.id)
+  return ret
 end

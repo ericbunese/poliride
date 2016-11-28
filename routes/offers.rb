@@ -3,14 +3,17 @@ post '/poliRide/createOffer' do
   response = Hash.new
   body = JSON.parse request.body.read
 
-  if (body.has_key?"driver" and body.has_key?"datetime" and body.has_key?"origin" and body.has_key?"destination")
+  if (body.has_key?"driver" and body.has_key?"datetime" and body.has_key?"origin" and body.has_key?"destination" and body.has_key?"originAddress" and body.has_key?"destinationAddress" and body.has_key?"carInfo")
     if (user_exists(body["driver"]))
       offer = Offer.create(
         status: 1,
         driver: body["driver"],
         datetime: body["datetime"],
         origin: body["origin"],
-        destination: body["destination"]
+        destination: body["destination"],
+        originAddress: body["originAddress"],
+        destinationAddress: body["destinationAddress"],
+        carInfo: body["carInfo"]
       )
       status 201
       response = offer
@@ -42,5 +45,10 @@ end
 
 #Get a driver's offers
 get '/poliRide/offers/:id' do
-  format_response(Offer.all(driver: params[:id]), request.accept)
+  offers = Offer.all(driver: params[:id])
+  array = Array.new
+  offers.each do |of|
+    array << join_offer_rides(of)
+  end
+  format_response(array, request.accept)
 end
